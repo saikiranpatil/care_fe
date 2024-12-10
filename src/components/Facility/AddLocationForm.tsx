@@ -209,6 +209,7 @@ export const AddLocationForm = ({ facilityId, locationId }: Props) => {
                   name="Location Middleware Address"
                   type="text"
                   label="Location Middleware Address"
+                  message="Leave blank to apply facility middleware to assets"
                   value={middlewareAddress}
                   onChange={(e) => setMiddlewareAddress(e.value)}
                   error={errors.middlewareAddress}

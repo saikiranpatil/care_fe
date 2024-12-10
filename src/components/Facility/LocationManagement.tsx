@@ -27,6 +27,7 @@ interface Props {
 interface LocationProps extends LocationModel {
   facilityId: string;
   disabled: boolean;
+  facilityMiddleware?: string;
   setShowDeletePopup: (e: { open: boolean; name: string; id: string }) => void;
 }
 
@@ -41,6 +42,18 @@ export default function LocationManagement({ facilityId }: Props) {
     open: false,
     name: "",
     id: "",
+  });
+  const [facilityMiddleware, setFacilityMiddleware] = useState<
+    string | undefined
+  >(undefined);
+
+  useQuery(routes.getPermittedFacility, {
+    pathParams: { id: facilityId },
+    onResponse: (res) => {
+      if (res.data) {
+        setFacilityMiddleware(res.data?.middleware_address);
+      }
+    },
   });
 
   const closeDeleteFailModal = () => {
@@ -121,6 +134,7 @@ export default function LocationManagement({ facilityId }: Props) {
                 <Location
                   setShowDeletePopup={setShowDeletePopup}
                   facilityId={facilityId}
+                  facilityMiddleware={facilityMiddleware}
                   {...item}
                   disabled={
                     ["DistrictAdmin", "StateAdmin"].includes(authUser.user_type)
@@ -221,6 +235,7 @@ const Location = ({
   name,
   description,
   middleware_address,
+  facilityMiddleware,
   location_type,
   created_date,
   modified_date,
@@ -268,14 +283,19 @@ const Location = ({
         >
           {description || "-"}
         </p>
-        <p className="mt-3 text-sm font-semibold text-secondary-700">
+        <span className="mt-3 text-sm font-semibold text-secondary-700">
           Middleware Address:
-        </p>
+        </span>
+        {!middleware_address && facilityMiddleware && (
+          <span className="ml-1 text-xs text-primary-400 opaticy-70">
+            Fetched from facility
+          </span>
+        )}
         <p
           className="mt-1 break-all font-mono text-sm font-bold text-secondary-700"
           id="view-location-middleware"
         >
-          {middleware_address || "-"}
+          {middleware_address || facilityMiddleware || "-"}
         </p>
         <Uptime
           route={routes.listFacilityAssetLocationAvailability}

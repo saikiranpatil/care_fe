@@ -150,7 +150,7 @@ export const FacilityConfigure = (props: IProps) => {
                 <TextFormField
                   name="middleware_address"
                   label="Facility Middleware Address"
-                  message="This addredd will be applied to all assets when asset and location middleware are Unspecified"
+                  message="This address will be applied to all assets when asset and location middleware are Unspecified"
                   required
                   value={state.form.middleware_address}
                   onChange={handleChange}

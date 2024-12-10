@@ -100,19 +100,12 @@ const HL7Monitor = (props: HL7MonitorProps) => {
                     label={
                       <div className="flex flex-row gap-1">
                         <p>Middleware Hostname</p>
-                        {resolvedMiddleware?.source != "asset" && (
-                          <div className="tooltip">
-                            <CareIcon
-                              icon="l-info-circle"
-                              className="tooltip text-indigo-500 hover:text-indigo-600"
-                            />
-                            <span className="tooltip-text w-56 whitespace-normal">
-                              Middleware hostname sourced from asset{" "}
-                              {resolvedMiddleware?.source}
-                            </span>
-                          </div>
-                        )}
                       </div>
+                    }
+                    message={
+                      resolvedMiddleware?.source != "asset"
+                        ? `Middleware hostname sourced from asset ${resolvedMiddleware?.source}`
+                        : undefined
                     }
                     placeholder={resolvedMiddleware?.hostname}
                     value={middlewareHostname}

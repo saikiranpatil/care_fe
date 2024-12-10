@@ -149,21 +149,15 @@ export default function ConfigureCamera(props: Props) {
               label={
                 <div className="flex flex-row gap-1">
                   <p>{t("middleware_hostname")}</p>
-                  {!!props.asset.resolved_middleware &&
-                    props.asset.resolved_middleware.source != "asset" && (
-                      <div className="tooltip">
-                        <CareIcon
-                          icon="l-info-circle"
-                          className="tooltip text-indigo-500 hover:text-indigo-600"
-                        />
-                        <span className="tooltip-text w-56 whitespace-normal">
-                          {t("middleware_hostname_sourced_from", {
-                            source: props.asset.resolved_middleware?.source,
-                          })}
-                        </span>
-                      </div>
-                    )}
                 </div>
+              }
+              message={
+                !!props.asset.resolved_middleware &&
+                props.asset.resolved_middleware.source != "asset"
+                  ? t("middleware_hostname_sourced_from", {
+                      source: props.asset.resolved_middleware?.source,
+                    })
+                  : undefined
               }
               placeholder={
                 props.asset.resolved_middleware?.hostname ??

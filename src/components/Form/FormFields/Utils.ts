@@ -20,9 +20,11 @@ export type FieldChangeEventHandler<T> = (event: FieldChangeEvent<T>) => void;
 export type FormFieldBaseProps<T> = {
   label?: React.ReactNode;
   labelSuffix?: React.ReactNode;
+  message?: string;
   disabled?: boolean;
   className?: string;
   required?: boolean;
+  messageClassName?: string;
   labelClassName?: string;
   errorClassName?: string;
   name: string;

@@ -48,6 +48,25 @@ export const FieldErrorText = (props: ErrorProps) => {
   );
 };
 
+type MessageProps = {
+  message: string | undefined;
+  className?: string | undefined;
+};
+
+export const FieldMessageText = (props: MessageProps) => {
+  return (
+    <span
+      className={classNames(
+        "text-primary-400 ml-1 mt-2 text-xs tracking-wide transition-opacity duration-300",
+        props.message ? "opacity-100" : "opacity-0",
+        props.className,
+      )}
+    >
+      {props.message}
+    </span>
+  );
+};
+
 const FormField = ({
   field,
   ...props
@@ -73,6 +92,10 @@ const FormField = ({
       </div>
       <div className={field?.className}>{props.children}</div>
       <FieldErrorText error={field?.error} className={field?.errorClassName} />
+      <FieldMessageText
+        message={field?.message}
+        className={field?.messageClassName}
+      />
     </div>
   );
 };

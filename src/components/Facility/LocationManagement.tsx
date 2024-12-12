@@ -287,8 +287,10 @@ const Location = ({
           Middleware Address:
         </span>
         {!middleware_address && facilityMiddleware && (
-          <span className="ml-1 text-xs text-primary-400">
-            Fetched from facility
+          <span className="ml-2 mt-2 text-xs h-fit rounded-full border-2 border-primary-500 bg-primary-100 px-3 py-[3px]">
+            <span className="text-xs font-bold text-primary-500">
+              Fetched from facility
+            </span>
           </span>
         )}
         <p

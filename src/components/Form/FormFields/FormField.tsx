@@ -1,3 +1,5 @@
+import { Label } from "@radix-ui/react-label";
+
 import { FieldError } from "@/components/Form/FieldValidators";
 import { FormFieldBaseProps } from "@/components/Form/FormFields/Utils";
 
@@ -14,7 +16,7 @@ type LabelProps = {
 
 export const FieldLabel = (props: LabelProps) => {
   return (
-    <label
+    <Label
       id={props.id}
       className={classNames(
         "block text-base font-normal text-secondary-900",
@@ -25,7 +27,7 @@ export const FieldLabel = (props: LabelProps) => {
     >
       {props.children}
       {props.required && <span className="text-danger-500">{" *"}</span>}
-    </label>
+    </Label>
   );
 };
 
@@ -57,8 +59,8 @@ export const FieldMessageText = (props: MessageProps) => {
   return (
     <span
       className={classNames(
-        "text-primary-400 ml-1 mt-2 text-xs tracking-wide transition-opacity duration-300",
-        props.message ? "opacity-100" : "opacity-0",
+        "text-secondary-700 ml-1 mt-2 text-xs tracking-wide transition-opacity duration-300",
+        props.message ? "opacity-80" : "opacity-0",
         props.className,
       )}
     >

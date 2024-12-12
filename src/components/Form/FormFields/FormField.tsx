@@ -1,4 +1,4 @@
-import { Label } from "@radix-ui/react-label";
+import { Label } from "@/components/ui/label";
 
 import { FieldError } from "@/components/Form/FieldValidators";
 import { FormFieldBaseProps } from "@/components/Form/FormFields/Utils";

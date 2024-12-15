@@ -20,6 +20,8 @@ import routes from "@/Utils/request/api";
 import request from "@/Utils/request/request";
 import useQuery from "@/Utils/request/useQuery";
 
+import { Badge } from "../ui/badge";
+
 interface Props {
   facilityId: string;
 }
@@ -267,14 +269,9 @@ const Location = ({
             >
               {name}
             </p>
-            <div
-              className="mt-2 h-fit rounded-full border-2 border-primary-500 bg-primary-100 px-3 py-[3px]"
-              id="location-type"
-            >
-              <p className="text-xs font-bold text-primary-500">
-                {location_type}
-              </p>
-            </div>
+            <Badge className="rounded-full bg-primary-100 text-primary-500 hover:bg-primary-100 border-2 border-primary-500 font-bold px-3 py-[3px] ml-2">
+              {location_type}
+            </Badge>
           </div>
         </div>
         <p
@@ -287,11 +284,9 @@ const Location = ({
           Middleware Address:
         </span>
         {!middleware_address && facilityMiddleware && (
-          <span className="ml-2 mt-2 text-xs h-fit rounded-full border-2 border-primary-500 bg-primary-100 px-3 py-[3px]">
-            <span className="text-xs font-bold text-primary-500">
-              Fetched from facility
-            </span>
-          </span>
+          <Badge className="rounded-full bg-primary-100 text-primary-500 hover:bg-primary-100 border-2 border-primary-500 font-bold px-3 py-[3px] ml-2">
+            Fetched from facility
+          </Badge>
         )}
         <p
           className="mt-1 break-all font-mono text-sm font-bold text-secondary-700"

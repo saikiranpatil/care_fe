@@ -4,6 +4,8 @@ import RecordMeta from "@/CAREUI/display/RecordMeta";
 import CareIcon from "@/CAREUI/icons/CareIcon";
 import PaginatedList from "@/CAREUI/misc/PaginatedList";
 
+import { Badge } from "@/components/ui/badge";
+
 import ButtonV2, { Cancel } from "@/components/Common/ButtonV2";
 import ConfirmDialog from "@/components/Common/ConfirmDialog";
 import DialogModal from "@/components/Common/Dialog";
@@ -19,8 +21,6 @@ import * as Notification from "@/Utils/Notifications";
 import routes from "@/Utils/request/api";
 import request from "@/Utils/request/request";
 import useTanStackQueryInstead from "@/Utils/request/useQuery";
-
-import { Badge } from "../ui/badge";
 
 interface Props {
   facilityId: string;
@@ -49,7 +49,7 @@ export default function LocationManagement({ facilityId }: Props) {
     string | undefined
   >(undefined);
 
-  useQuery(routes.getPermittedFacility, {
+  useTanStackQueryInstead(routes.getPermittedFacility, {
     pathParams: { id: facilityId },
     onResponse: (res) => {
       if (res.data) {

@@ -18,7 +18,7 @@ import AuthorizeFor, { NonReadOnlyUsers } from "@/Utils/AuthorizeFor";
 import * as Notification from "@/Utils/Notifications";
 import routes from "@/Utils/request/api";
 import request from "@/Utils/request/request";
-import useQuery from "@/Utils/request/useQuery";
+import useTanStackQueryInstead from "@/Utils/request/useQuery";
 
 import { Badge } from "../ui/badge";
 
@@ -246,7 +246,7 @@ const Location = ({
   setShowDeletePopup,
   facilityId,
 }: LocationProps) => {
-  const bedsQuery = useQuery(routes.listFacilityBeds, {
+  const bedsQuery = useTanStackQueryInstead(routes.listFacilityBeds, {
     query: {
       facility: facilityId,
       location: id,

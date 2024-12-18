@@ -65,11 +65,10 @@ export const FacilityConfigure = (props: IProps) => {
     };
 
     setIsLoading(true);
-    console.log(formData);
 
     const { res, error } = await request(routes.partialUpdateFacility, {
       pathParams: { id: facilityId },
-      body: data,
+      body: formData,
     });
 
     setIsLoading(false);

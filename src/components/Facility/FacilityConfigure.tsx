@@ -1,108 +1,71 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { t } from "i18next";
 import { navigate } from "raviger";
-import { useReducer, useState } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { Submit } from "@/components/Common/ButtonV2";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
 import Loading from "@/components/Common/Loading";
 import Page from "@/components/Common/Page";
-import TextFormField from "@/components/Form/FormFields/TextFormField";
-import { FieldChangeEvent } from "@/components/Form/FormFields/Utils";
 
 import { PLUGIN_Component } from "@/PluginEngine";
 import * as Notification from "@/Utils/Notifications";
 import routes from "@/Utils/request/api";
+import query from "@/Utils/request/query";
 import request from "@/Utils/request/request";
-import useTanStackQueryInstead from "@/Utils/request/useQuery";
 
-const initForm = {
-  name: "",
-  state: 0,
-  district: 0,
-  localbody: 0,
-  ward: 0,
-  middleware_address: "",
-};
-
-const initialState = {
-  form: { ...initForm },
-  errors: {},
-};
-
-const FormReducer = (state = initialState, action: any) => {
-  switch (action.type) {
-    case "set_form": {
-      return {
-        ...state,
-        form: action.form,
-      };
-    }
-    case "set_error": {
-      return {
-        ...state,
-        errors: action.errors,
-      };
-    }
-    default:
-      return state;
-  }
-};
+import { Submit } from "../Common/ButtonV2";
 
 interface IProps {
   facilityId: string;
 }
 
+const formSchema = z.object({
+  middleware_address: z
+    .string()
+    .nonempty({ message: "Middleware Address is required" })
+    .regex(/^(?!https?:\/\/)[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)*\.[a-zA-Z]{2,}$/, {
+      message: "Invalid Middleware Address",
+    }),
+});
+
 export const FacilityConfigure = (props: IProps) => {
-  const [state, dispatch] = useReducer(FormReducer, initialState);
   const { facilityId } = props;
   const [isLoading, setIsLoading] = useState(false);
 
-  const { loading } = useTanStackQueryInstead(routes.getPermittedFacility, {
-    pathParams: { id: facilityId },
-    onResponse: (res) => {
-      if (res.data) {
-        const formData = {
-          name: res.data.name,
-          state: res.data.state,
-          district: res.data.district,
-          local_body: res.data.local_body,
-          ward: res.data.ward,
-          middleware_address: res.data.middleware_address,
-        };
-        dispatch({ type: "set_form", form: formData });
-      }
-    },
+  const { isPending: loading, data } = useQuery({
+    queryKey: [routes.getPermittedFacility.path, facilityId],
+    queryFn: query(routes.getPermittedFacility, {
+      pathParams: { id: facilityId },
+    }),
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    if (!state.form.middleware_address) {
-      dispatch({
-        type: "set_error",
-        errors: { middleware_address: ["Middleware Address is required"] },
-      });
-      setIsLoading(false);
-      return;
-    }
-    if (
-      state.form.middleware_address.match(
-        /^(?!https?:\/\/)[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)*\.[a-zA-Z]{2,}$/,
-      ) === null
-    ) {
-      dispatch({
-        type: "set_error",
-        errors: {
-          middleware_address: ["Invalid Middleware Address"],
-        },
-      });
-      setIsLoading(false);
-      return;
-    }
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!data) return;
 
-    const data = {
-      ...state.form,
-      middleware_address: state.form.middleware_address,
+    const formData = {
+      name: data.name,
+      state: data.state,
+      district: data.district,
+      local_body: data.local_body,
+      ward: data.ward,
+      middleware_address: values.middleware_address,
     };
+
+    setIsLoading(true);
+    console.log(formData);
 
     const { res, error } = await request(routes.partialUpdateFacility, {
       pathParams: { id: facilityId },
@@ -123,14 +86,18 @@ export const FacilityConfigure = (props: IProps) => {
     setIsLoading(false);
   };
 
-  const handleChange = (e: FieldChangeEvent<string>) => {
-    dispatch({
-      type: "set_form",
-      form: { ...state.form, [e.name]: e.value },
-    });
-  };
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: { middleware_address: "" },
+  });
 
-  if (isLoading || loading) {
+  useEffect(() => {
+    if (data && data.middleware_address) {
+      form.setValue("middleware_address", data.middleware_address);
+    }
+  }, [form, data]);
+
+  if (isLoading || !data || loading) {
     return <Loading />;
   }
 
@@ -138,30 +105,42 @@ export const FacilityConfigure = (props: IProps) => {
     <Page
       title="Configure Facility"
       crumbsReplacements={{
-        [facilityId]: { name: state.form.name },
+        [facilityId]: { name: data.name },
       }}
       className="w-full overflow-x-hidden"
     >
       <div className="mx-auto max-w-3xl">
         <div className="cui-card mt-4">
-          <form onSubmit={handleSubmit}>
-            <div className="mt-2 grid grid-cols-1 gap-4">
-              <div>
-                <TextFormField
-                  name="middleware_address"
-                  label="Facility Middleware Address"
-                  message="This address will be applied to all assets when asset and location middleware are Unspecified"
-                  required
-                  value={state.form.middleware_address}
-                  onChange={handleChange}
-                  error={state.errors?.middleware_address}
-                />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <FormField
+                control={form.control}
+                name="middleware_address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="block text-base font-normal text-secondary-900">
+                      Facility Middleware Address
+                      <span className="text-danger-500"> *</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Enter Middleware Address"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      This address will be applied to all assets when asset and
+                      location middleware are Unspecified.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                <Submit label="Update" />
               </div>
-            </div>
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-              <Submit onClick={handleSubmit} label="Update" />
-            </div>
-          </form>
+            </form>
+          </Form>
         </div>
 
         <PLUGIN_Component

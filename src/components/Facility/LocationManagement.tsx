@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 import RecordMeta from "@/CAREUI/display/RecordMeta";
@@ -19,6 +20,7 @@ import useAuthUser from "@/hooks/useAuthUser";
 import AuthorizeFor, { NonReadOnlyUsers } from "@/Utils/AuthorizeFor";
 import * as Notification from "@/Utils/Notifications";
 import routes from "@/Utils/request/api";
+import query from "@/Utils/request/query";
 import request from "@/Utils/request/request";
 import useTanStackQueryInstead from "@/Utils/request/useQuery";
 
@@ -45,18 +47,15 @@ export default function LocationManagement({ facilityId }: Props) {
     name: "",
     id: "",
   });
-  const [facilityMiddleware, setFacilityMiddleware] = useState<
-    string | undefined
-  >(undefined);
 
-  useTanStackQueryInstead(routes.getPermittedFacility, {
-    pathParams: { id: facilityId },
-    onResponse: (res) => {
-      if (res.data) {
-        setFacilityMiddleware(res.data?.middleware_address);
-      }
-    },
+  const { data } = useQuery({
+    queryKey: [routes.getPermittedFacility.path, facilityId],
+    queryFn: query(routes.getPermittedFacility, {
+      pathParams: { id: facilityId },
+    }),
   });
+
+  const facilityMiddleware = data?.middleware_address;
 
   const closeDeleteFailModal = () => {
     setShowDeleteFailModal({ ...showDeleteFailModal, open: false });

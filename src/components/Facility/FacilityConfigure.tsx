@@ -1,10 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { t } from "i18next";
 import { navigate } from "raviger";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import CareIcon from "@/CAREUI/icons/CareIcon";
 
 import {
   Form,
@@ -23,10 +25,10 @@ import Page from "@/components/Common/Page";
 import { PLUGIN_Component } from "@/PluginEngine";
 import * as Notification from "@/Utils/Notifications";
 import routes from "@/Utils/request/api";
+import mutate from "@/Utils/request/mutate";
 import query from "@/Utils/request/query";
-import request from "@/Utils/request/request";
 
-import { Submit } from "../Common/ButtonV2";
+import { Button } from "../ui/button";
 
 interface IProps {
   facilityId: string;
@@ -43,16 +45,27 @@ const formSchema = z.object({
 
 export const FacilityConfigure = (props: IProps) => {
   const { facilityId } = props;
-  const [isLoading, setIsLoading] = useState(false);
 
-  const { isPending: loading, data } = useQuery({
+  const { isPending: queryLoading, data } = useQuery({
     queryKey: [routes.getPermittedFacility.path, facilityId],
     queryFn: query(routes.getPermittedFacility, {
       pathParams: { id: facilityId },
     }),
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const { isPending: mutateLoading, mutate: updateFacility } = useMutation({
+    mutationFn: mutate(routes.partialUpdateFacility, {
+      pathParams: { id: facilityId },
+    }),
+    onSuccess: () => {
+      Notification.Success({
+        msg: t("update_facility_middleware_success"),
+      });
+      navigate(`/facility/${facilityId}`);
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (!data) return;
 
     const formData = {
@@ -64,25 +77,7 @@ export const FacilityConfigure = (props: IProps) => {
       middleware_address: values.middleware_address,
     };
 
-    setIsLoading(true);
-
-    const { res, error } = await request(routes.partialUpdateFacility, {
-      pathParams: { id: facilityId },
-      body: formData,
-    });
-
-    setIsLoading(false);
-    if (res?.ok) {
-      Notification.Success({
-        msg: t("update_facility_middleware_success"),
-      });
-      navigate(`/facility/${facilityId}`);
-    } else {
-      Notification.Error({
-        msg: error?.detail ?? "Something went wrong",
-      });
-    }
-    setIsLoading(false);
+    updateFacility(formData);
   };
 
   const form = useForm({
@@ -96,7 +91,7 @@ export const FacilityConfigure = (props: IProps) => {
     }
   }, [form, data]);
 
-  if (isLoading || !data || loading) {
+  if (queryLoading || !data || mutateLoading) {
     return <Loading />;
   }
 
@@ -136,7 +131,14 @@ export const FacilityConfigure = (props: IProps) => {
                 )}
               />
               <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                <Submit label="Update" />
+                <Button
+                  variant="primary"
+                  type="submit"
+                  className="bg-primary-500 gap-2 px-4 py-2 rounded-sm hover:bg-primary-400"
+                >
+                  <CareIcon icon="l-check-circle" className="text-lg" />
+                  Update
+                </Button>
               </div>
             </form>
           </Form>

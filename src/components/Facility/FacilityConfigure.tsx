@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import CareIcon from "@/CAREUI/icons/CareIcon";
 
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -27,8 +28,6 @@ import * as Notification from "@/Utils/Notifications";
 import routes from "@/Utils/request/api";
 import mutate from "@/Utils/request/mutate";
 import query from "@/Utils/request/query";
-
-import { Button } from "../ui/button";
 
 interface IProps {
   facilityId: string;

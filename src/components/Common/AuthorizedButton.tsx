@@ -5,7 +5,7 @@ import AuthorizedChild from "@/CAREUI/misc/AuthorizedChild";
 import { AuthorizedElementProps } from "@/Utils/AuthorizeFor";
 
 export const AuthorizedButton: React.FC<
-  AuthorizedElementProps & ButtonProps
+  AuthorizedElementProps & ButtonProps & { variant?: string }
 > = ({ authorizeFor = () => true, ...props }) => {
   return (
     <AuthorizedChild authorizeFor={authorizeFor}>

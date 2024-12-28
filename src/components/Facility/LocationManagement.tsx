@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { navigate } from "raviger";
 import { useState } from "react";
 
 import RecordMeta from "@/CAREUI/display/RecordMeta";
@@ -6,8 +7,16 @@ import CareIcon from "@/CAREUI/icons/CareIcon";
 import PaginatedList from "@/CAREUI/misc/PaginatedList";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-import ButtonV2, { Cancel } from "@/components/Common/ButtonV2";
+import { AuthorizedButton } from "@/components/Common/AuthorizedButton";
+import CancelButton from "@/components/Common/CancelButton";
 import ConfirmDialog from "@/components/Common/ConfirmDialog";
 import DialogModal from "@/components/Common/Dialog";
 import Loading from "@/components/Common/Loading";
@@ -101,26 +110,26 @@ export default function LocationManagement({ facilityId }: Props) {
           title="Location Management"
           backUrl={`/facility/${facilityId}`}
           options={
-            <ButtonV2
+            <AuthorizedButton
               id="add-new-location"
-              href={`/facility/${facilityId}/location/add`}
+              onClick={() => navigate(`/facility/${facilityId}/location/add`)}
               authorizeFor={NonReadOnlyUsers}
               className="hidden lg:block"
             >
               <CareIcon icon="l-plus" className="text-lg" />
               Add New Location
-            </ButtonV2>
+            </AuthorizedButton>
           }
         >
           <div className="mx-auto mt-4 lg:mt-0">
-            <ButtonV2
-              href={`/facility/${facilityId}/location/add`}
+            <AuthorizedButton
+              onClick={() => navigate(`/facility/${facilityId}/location/add`)}
               authorizeFor={NonReadOnlyUsers}
               className="w-full lg:hidden"
             >
               <CareIcon icon="l-plus" className="text-lg" />
               Add New Location
-            </ButtonV2>
+            </AuthorizedButton>
           </div>
           <div className="w-full @container">
             <PaginatedList.WhenEmpty className="flex w-full justify-center border-b border-secondary-200 bg-white p-5 text-center text-2xl font-bold text-secondary-500">
@@ -186,19 +195,23 @@ export default function LocationManagement({ facilityId }: Props) {
                     deleted first before the location can be removed
                   </div>
                   <div className="mt-2 flex flex-col justify-end gap-2 md:flex-row">
-                    <Cancel
+                    <CancelButton
                       onClick={() => {
                         closeDeleteFailModal();
                       }}
                     />
-                    <ButtonV2
+                    <AuthorizedButton
                       id="manage-beds"
-                      href={`/facility/${facilityId}/location/${showDeleteFailModal.id}/beds`}
+                      onClick={() =>
+                        navigate(
+                          `/facility/${facilityId}/location/${showDeleteFailModal.id}/beds`,
+                        )
+                      }
                       authorizeFor={NonReadOnlyUsers}
                       className="w-full"
                     >
                       Manage Beds
-                    </ButtonV2>
+                    </AuthorizedButton>
                   </div>
                 </div>
               ) : (
@@ -208,19 +221,23 @@ export default function LocationManagement({ facilityId }: Props) {
                     be deleted first before the location can be removed
                   </div>
                   <div className="mt-2 flex flex-col justify-end gap-2 md:flex-row">
-                    <Cancel
+                    <CancelButton
                       onClick={() => {
                         closeDeleteFailModal();
                       }}
                     />
-                    <ButtonV2
+                    <AuthorizedButton
                       id="manage-assets"
-                      href={`/assets?page=1&limit=18&facility=${facilityId}&asset_type=&asset_class=&status=&location=${showDeleteFailModal.id}&warranty_amc_end_of_validity_before=&warranty_amc_end_of_validity_after=`}
+                      onClick={() =>
+                        navigate(
+                          `/assets?page=1&limit=18&facility=${facilityId}&asset_type=&asset_class=&status=&location=${showDeleteFailModal.id}&warranty_amc_end_of_validity_before=&warranty_amc_end_of_validity_after=`,
+                        )
+                      }
                       authorizeFor={NonReadOnlyUsers}
                       className="w-full"
                     >
                       Manage Assets
-                    </ButtonV2>
+                    </AuthorizedButton>
                   </div>
                 </div>
               )}
@@ -305,12 +322,11 @@ const Location = ({
         />
       </div>
 
-      <ButtonV2
+      <Button
         id="manage-bed-button"
         variant="secondary"
-        border
-        className="mt-3 flex w-full items-center justify-between"
-        href={`location/${id}/beds`}
+        className="mt-3 flex w-full items-center justify-between button-secondary-border"
+        onClick={() => navigate(`location/${id}/beds`)}
         disabled={totalBeds == null}
       >
         Manage Beds
@@ -318,39 +334,46 @@ const Location = ({
           <CareIcon icon="l-bed" className="text-lg" />
           {totalBeds ?? "--"}
         </span>
-      </ButtonV2>
+      </Button>
       <div className="mt-2 flex w-full flex-col gap-2 md:flex-row">
         <div className="w-full md:w-1/2">
-          <ButtonV2
+          <AuthorizedButton
             id="edit-location-button"
             variant="secondary"
-            border
-            className="w-full"
-            href={`location/${id}/update`}
+            className="w-full button-secondary-border"
+            onClick={() => navigate(`location/${id}/update`)}
             authorizeFor={NonReadOnlyUsers}
           >
             <CareIcon icon="l-pen" className="text-lg" />
             Edit
-          </ButtonV2>
+          </AuthorizedButton>
         </div>
         <div className="w-full md:w-1/2">
-          <ButtonV2
-            authorizeFor={AuthorizeFor(["DistrictAdmin", "StateAdmin"])}
-            id="delete-location-button"
-            variant="secondary"
-            border
-            className="w-full"
-            tooltip={
-              disabled ? "Contact your admin to delete the location" : ""
-            }
-            tooltipClassName=" text-xs w-full lg:w-auto"
-            onClick={() =>
-              setShowDeletePopup({ open: true, name: name ?? "", id: id ?? "" })
-            }
-          >
-            <CareIcon icon="l-trash" className="text-lg" />
-            Delete
-          </ButtonV2>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <AuthorizedButton
+                  authorizeFor={AuthorizeFor(["DistrictAdmin", "StateAdmin"])}
+                  id="delete-location-button"
+                  variant="secondary"
+                  className="w-full button-secondary-border"
+                  onClick={() =>
+                    setShowDeletePopup({
+                      open: true,
+                      name: name ?? "",
+                      id: id ?? "",
+                    })
+                  }
+                >
+                  <CareIcon icon="l-trash" className="text-lg" />
+                  Delete
+                </AuthorizedButton>
+              </TooltipTrigger>
+              <TooltipContent className="text-xs w-full lg:w-auto">
+                {disabled ? "Contact your admin to delete the location" : ""}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
 
